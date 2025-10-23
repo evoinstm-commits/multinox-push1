@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Space Invaders</title>
+    <style>
+        :root {
+            --bg1: #03051e;
+            --bg2: #06113a;
+            --accent: #7be4ff;
+            --danger: #ff6b6b;
+            --glass: rgba(255, 255, 255, 0.06)
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            font-family: Inter, ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica, Arial;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 20% 10%, #05204a 0%, var(--bg1) 30%, var(--bg2) 100%);
+            color: #e6f7ff
+        }
+
+        #app {
+            width: 100%;
+            max-width: 960px;
+            margin: 32px;
+            padding: 18px;
+            border-radius: 16px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.05));
+            box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
+            position: relative
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px
+        }
+
+        .h-left {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #3ab2ff, #7be4ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #04233a;
+            font-weight: 700;
+            font-size: 18px
+        }
+
+        .title {
+            font-weight: 700;
+            font-size: 18px
+        }
+
+        .h-right {
+            display: flex;
+            gap: 10px;
+            align-items: center
+        }
+
+        .stat {
+            background: var(--glass);
+            padding: 8px 12px;
+            border-radius: 10px;
+            backdrop-filter: blur(4px);
+            font-weight: 600
+        }
+
+        canvas {
+            width: 100%;
+            height: 600px;
+            display: block;
+            border-radius: 10px;
+            background: transparent
+        }
+
+        .controls {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 12px
+        }
+
+        .btn {
+            padding: 8px 14px;
+            border-radius: 10px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(0, 0, 0, 0.05));
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+            font-weight: 700
+        }
+
+        .btn.primary {
+            background: linear-gradient(180deg, #2b9cff, #0066ff);
+            color: white;
+            border: none;
+            box-shadow: 0 6px 18px rgba(43, 156, 255, 0.18)
+        }
+
+        .overlay {
+            position: absolute;
+            inset: 18px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none
+        }
+
+        .menu {
+            width: 80%;
+            max-width: 560px;
+            padding: 28px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.06));
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(2, 6, 23, 0.6);
+            text-align: center;
+            pointer-events: auto
+        }
+
+        .menu h1 {
+            font-size: 28px;
+            margin-bottom: 8px
+        }
+
+        .menu p {
+            opacity: 0.8;
+            margin-bottom: 16px
+        }
+
+        .controls .note {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7)
+        }
+
+        .hud {
+            position: absolute;
+            left: 20px;
+            top: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .hud .chip {
+            background: rgba(0, 0, 0, 0.45);
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-weight: 700
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            opacity: 0.9
+        }
+
+        .small {
+            font-size: 12px;
+            color: #b8e7ff
+        }
+
+        .controls .touch-help {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6)
+        }
+
+        @media (max-width:640px) {
+            canvas {
+                height: 420px
+            }
+
+            .menu {
+                width: 92%
+            }
+        }
+
+        a:link,
+        a:visited {
+            background-color: #05204a;
+            color: #b8e7ff;
+            padding: 14px 25px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        a:hover,
+        a:active {
+            background-color: #3ab2ff
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="header">
+            <div class="h-left">
+                <div class="logo">SI</div>
+                <div>
+                    <div class="title">Space Invaders</div>
+                    <div style="font-size:12px;opacity:0.75">Arrow keys / A D to move • Space / Tap to shoot</div>
+                </div>
+            </div>
+            <div class="h-right">
+                <div class="stat">Score: <span id="score">0</span></div>
+                <div class="stat">High: <span id="high">0</span></div>
+            </div>
+        </div>
+        <div style="position:relative">
+            <canvas id="game" width="900" height="600"></canvas>
+            <div class="hud">
+                <div class="chip">Lives: <span id="lives">3</span></div>
+                <div class="chip">Level: <span id="level">1</span></div>
+            </div>
+            <div class="overlay" id="overlay">
+                <div class="menu" id="menu">
+                    <h1>Space Invaders</h1>
+                    <p>Fight waves of enemies. Survive. Top the high score stored in your browser.</p>
+                    <div style="display:flex;gap:10px;justify-content:center;margin-bottom:12px">
+                        <button class="btn primary" id="startBtn">Start</button>
+                        <button class="btn" id="howBtn">How to play</button>
+                    </div>
+                    <div style="display:flex;gap:10px;justify-content:center;align-items:center">
+                        <div class="small">High Score: <strong id="menuHigh">0</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="controls">
+            <div class="note">Keyboard: ← → or A D to move. Space to shoot.</div>
+            <div class="touch-help">Touch: Tap left/right side to move. Tap top half to shoot.</div>
+        </div>
+        <div class="footer">
+            <div class="small"></div>
+            <div class="small"><a href="chemistry.html">Go Back</a></div>
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+        let W = canvas.width, H = canvas.height;
+        const scoreEl = document.getElementById('score');
+        const highEl = document.getElementById('high');
+        const livesEl = document.getElementById('lives');
+        const levelEl = document.getElementById('level');
+        const menu = document.getElementById('menu');
+        const overlay = document.getElementById('overlay');
+        const startBtn = document.getElementById('startBtn');
+        const howBtn = document.getElementById('howBtn');
+        const menuHigh = document.getElementById('menuHigh');
+
+        let lastTime = 0; let dt = 0;
+        let keys = {};
+        let touches = [];
+        let game = null;
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function beep(freq = 440, duration = 0.08, type = 'sine', gain = 0.12) {
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.type = type; o.frequency.value = freq;
+            g.gain.value = gain;
+            o.connect(g); g.connect(audioCtx.destination);
+            o.start(); g.gain.setValueAtTime(gain, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            o.stop(audioCtx.currentTime + duration);
+        }
+
+        function rand(a, b) { return Math.random() * (b - a) + a }
+        function clamp(v, a, b) { return Math.max(a, Math.min(b, v)) }
+
+        const HS_KEY = 'ss_high_v1';
+        function getHigh() { return parseInt(localStorage.getItem(HS_KEY) || '0', 10) }
+        function setHigh(v) { localStorage.setItem(HS_KEY, String(v)) }
+        menuHigh.textContent = getHigh();
+        highEl.textContent = getHigh();
+
+        class Player {
+            constructor() {
+                this.w = 36; this.h = 48; this.x = W / 2; this.y = H - 80; this.vx = 0; this.speed = 420; this.cool = 0; this.coolMax = 0.18; this.lives = 3; this.alive = true; this.flash = 0;
+            }
+            update(dt) {
+                let dir = 0;
+                if (keys['ArrowLeft'] || keys['a'] || keys['A']) dir -= 1;
+                if (keys['ArrowRight'] || keys['d'] || keys['D']) dir += 1;
+                if (touches.length) {
+                    const avgX = touches.reduce((s, t) => s + t.x, 0) / touches.length;
+                    dir = Math.sign(avgX - this.x);
+                    const topTouch = touches.some(t => t.y < H * 0.5);
+                    if (topTouch) this.tryShoot();
+                }
+                this.vx = dir * this.speed;
+                this.x += this.vx * dt;
+                this.x = clamp(this.x, 40, W - 40);
+                this.cool -= dt; if (this.cool < 0) this.cool = 0;
+            }
+            tryShoot() { if (this.cool > 0) return; this.cool = this.coolMax; game.spawnBullet(this.x, this.y - 26, -700, 'player'); beep(880, 0.06, 'square', 0.06); }
+            draw(ctx) {
+
+                ctx.save(); ctx.translate(this.x, this.y);
+                const g = ctx.createLinearGradient(-18, -24, 18, 24); g.addColorStop(0, '#7be4ff'); g.addColorStop(1, '#0c6bff');
+                ctx.fillStyle = g;
+                ctx.beginPath(); ctx.moveTo(0, -26); ctx.lineTo(20, 18); ctx.lineTo(0, 12); ctx.lineTo(-20, 18); ctx.closePath(); ctx.fill();
+
+                ctx.fillStyle = 'rgba(255,255,255,0.14)'; ctx.beginPath(); ctx.ellipse(0, -4, 8, 6, 0, 0, Math.PI * 2); ctx.fill();
+
+                if (((Date.now() / 90) | 0) % 2 === 0) { ctx.fillStyle = 'rgba(255,180,60,0.9)'; ctx.beginPath(); ctx.ellipse(0, 20, 6, 10, 0, 0, Math.PI * 2); ctx.fill(); }
+                ctx.restore();
+                if (this.flash > 0) { this.flash -= dt; }
+            }
+        }
+
+        class Bullet {
+            constructor(x, y, vy, tag) { this.x = x; this.y = y; this.vy = vy; this.r = 4; this.tag = tag; }
+            update(dt) { this.y += this.vy * dt }
+            draw(ctx) { ctx.beginPath(); ctx.fillStyle = (this.tag === 'player') ? '#aef' : '#f88'; ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2); ctx.fill(); }
+        }
+
+        class Enemy {
+            constructor(x, y, type = 0) { this.x = x; this.y = y; this.type = type; this.r = 18; this.vx = rand(-30, 30); this.vy = rand(20, 60); this.hp = (type + 1); this.dead = false; }
+            update(dt) { this.x += this.vx * dt; this.y += this.vy * dt; if (this.x < 30 || this.x > W - 30) this.vx *= -1 }
+            draw(ctx) {
+                ctx.save(); ctx.translate(this.x, this.y);
+
+                const g = ctx.createRadialGradient(-6, -6, 2, 6, 6, 28);
+                g.addColorStop(0, '#ffdd99'); g.addColorStop(1, '#ff8c4a');
+                ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, -20); ctx.quadraticCurveTo(22, 0, 0, 22); ctx.quadraticCurveTo(-22, 0, 0, -20); ctx.fill();
+
+                ctx.fillStyle = '#04233a'; ctx.beginPath(); ctx.ellipse(-6, -2, 4, 6, 0, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.ellipse(6, -2, 4, 6, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        class Particle {
+            constructor(x, y, vx, vy, r, life) { this.x = x; this.y = y; this.vx = vx; this.vy = vy; this.r = r; this.life = life; this.max = life }
+            update(dt) { this.life -= dt; this.x += this.vx * dt; this.y += this.vy * dt }
+            draw(ctx) { if (this.life <= 0) return; ctx.globalAlpha = Math.max(0, this.life / this.max); ctx.beginPath(); ctx.fillStyle = '#ffd'; ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1 }
+        }
+
+
+        class Game {
+            constructor() { this.reset(); }
+            reset() { this.player = new Player(); this.bullets = []; this.enemies = []; this.particles = []; this.score = 0; this.level = 1; this.spawnTimer = 0; this.spawnInterval = 1.2; this.state = 'menu'; this.high = getHigh(); }
+            start() { this.reset(); this.state = 'running'; overlay.style.display = 'none'; this.player.lives = 3; this.level = 1 }
+            gameOver() {
+                this.state = 'over'; overlay.style.display = 'flex'; menu.innerHTML = `<div class=menu><h1>Game Over</h1><p>Your score ${this.score}</p><div style="display:flex;gap:10px;justify-content:center;margin-top:12px"><button class='btn primary' id='restart'>Restart</button><button class='btn' id='menuBtn'><a href="chemistry.html">Go Back</a></button></div></div>`;
+
+                if (this.score > this.high) { this.high = this.score; setHigh(this.high); menu.querySelector('#restart')?.focus(); }
+                document.getElementById('menu').querySelector('#restart')?.addEventListener('click', () => { this.start() });
+                const mb = document.getElementById('menu').querySelector('#menuBtn'); if (mb) mb.addEventListener('click', () => { location.reload() });
+                highEl.textContent = this.high; menuHigh.textContent = this.high;
+            }
+            spawnBullet(x, y, vy, tag) { this.bullets.push(new Bullet(x, y, vy, tag)) }
+            spawnEnemy() {
+                const x = rand(60, W - 60); const y = -40; const type = Math.floor(rand(0, 2)); this.enemies.push(new Enemy(x, y, type));
+            }
+            update(dt) {
+                if (this.state !== 'running') return;
+                this.player.update(dt);
+
+                if ((keys[' '] || keys['Spacebar'] || keys['Space'])) this.player.tryShoot();
+
+                for (const b of this.bullets) b.update(dt);
+                this.bullets = this.bullets.filter(b => b.y > -60 && b.y < H + 60);
+
+                for (const e of this.enemies) e.update(dt);
+
+                for (const b of this.bullets) {
+                    if (b.tag === 'player') {
+                        for (const e of this.enemies) {
+                            const dx = b.x - e.x, dy = b.y - e.y; if (dx * dx + dy * dy < (e.r + 6) * (e.r + 6)) {
+                                b.y = -999; e.hp--; this.score += 10; spawnExplosion(e.x, e.y, 8); beep(600, 0.04, 'sine', 0.06);
+                                if (e.hp <= 0) {
+                                    this.killEnemy(e);
+                                }
+                                break;
+                            }
+                        }
+                    } else if (b.tag === 'enemy') {
+                        const p = this.player; const dx = b.x - p.x, dy = b.y - p.y; if (dx * dx + dy * dy < 900) { this.playerCrash(); b.y = -999; }
+                    }
+                }
+
+                for (const e of this.enemies) {
+                    const dx = e.x - this.player.x, dy = e.y - this.player.y; if (dx * dx + dy * dy < (e.r + 20) * (e.r + 20)) {
+                        this.killEnemy(e); this.playerCrash();
+                    }
+                }
+
+                this.enemies = this.enemies.filter(e => !e.dead && e.y < H + 60);
+
+                this.spawnTimer -= dt; if (this.spawnTimer <= 0) { this.spawnEnemy(); this.spawnTimer = this.spawnInterval; if (Math.random() < 0.3) this.spawnTimer *= 0.5 }
+
+                if (this.score > this.level * 200) { this.level++; this.spawnInterval = Math.max(0.4, this.spawnInterval - 0.12); }
+
+                for (const p of this.particles) p.update(dt);
+                this.particles = this.particles.filter(p => p.life > 0);
+
+                scoreEl.textContent = this.score; highEl.textContent = this.high; livesEl.textContent = this.player.lives; levelEl.textContent = this.level;
+            }
+            killEnemy(e) { e.dead = true; this.score += 25; spawnExplosion(e.x, e.y, 18); }
+            playerCrash() {
+                this.player.lives -= 1; spawnExplosion(this.player.x, this.player.y, 34); beep(160, 0.22, 'sawtooth', 0.18);
+                this.player.x = W / 2; if (this.player.lives <= 0) this.gameOver();
+            }
+            draw(ctx) {
+
+                drawBackground(ctx);
+
+                for (const b of this.bullets) b.draw(ctx);
+                for (const e of this.enemies) e.draw(ctx);
+                this.player.draw(ctx);
+                for (const p of this.particles) p.draw(ctx);
+
+                ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.restore();
+            }
+        }
+
+
+        let stars = [];
+        function initStars() { stars = []; for (let i = 0; i < 120; i++) { stars.push({ x: rand(0, W), y: rand(0, H), r: Math.random() * 1.6, vel: rand(6, 40) }) } }
+        function drawBackground(ctx) {
+            ctx.save(); ctx.fillStyle = 'rgba(3,7,19,0.22)'; ctx.fillRect(0, 0, W, H);
+            for (const s of stars) { s.y += s.vel * 0.016; if (s.y > H) s.y = 0; ctx.beginPath(); ctx.globalAlpha = 0.9; ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill(); }
+
+            const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, 'rgba(10,24,56,0.12)'); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+            ctx.restore();
+        }
+
+        function spawnExplosion(x, y, count) { for (let i = 0; i < count; i++) { const ang = rand(0, Math.PI * 2); const sp = rand(30, 260); game.particles.push(new Particle(x, y, Math.cos(ang) * sp, Math.sin(ang) * sp, rand(1.2, 3.6), rand(0.6, 1.4))); } }
+
+
+        window.addEventListener('keydown', e => { keys[e.key] = true; if ([' ', 'Spacebar', 'Space'].includes(e.key)) { e.preventDefault(); } });
+        window.addEventListener('keyup', e => { keys[e.key] = false; });
+        canvas.addEventListener('touchstart', e => { e.preventDefault(); touches = Array.from(e.touches).map(t => ({ x: t.clientX - canvas.getBoundingClientRect().left, y: t.clientY - canvas.getBoundingClientRect().top })); }, { passive: false });
+        canvas.addEventListener('touchmove', e => { e.preventDefault(); touches = Array.from(e.touches).map(t => ({ x: t.clientX - canvas.getBoundingClientRect().left, y: t.clientY - canvas.getBoundingClientRect().top })); }, { passive: false });
+        canvas.addEventListener('touchend', e => { e.preventDefault(); touches = Array.from(e.touches).map(t => ({ x: t.clientX - canvas.getBoundingClientRect().left, y: t.clientY - canvas.getBoundingClientRect().top })); }, { passive: false });
+        canvas.addEventListener('mousedown', e => { const r = canvas.getBoundingClientRect(); const x = e.clientX - r.left, y = e.clientY - r.top; if (y < H * 0.45) game.player.tryShoot(); else if (x < W * 0.5) keys['ArrowLeft'] = true; else keys['ArrowRight'] = true; });
+        window.addEventListener('mouseup', () => { keys['ArrowLeft'] = false; keys['ArrowRight'] = false; });
+
+
+        function resize() { const rect = canvas.getBoundingClientRect(); const scale = Math.min(rect.width / W, 1); canvas.style.height = (H * scale) + 'px'; }
+        window.addEventListener('resize', resize);
+
+
+        function loop(ts) { if (!lastTime) lastTime = ts; dt = Math.min(0.04, (ts - lastTime) / 1000); lastTime = ts; if (game) game.update(dt); ctx.clearRect(0, 0, W, H); if (game) game.draw(ctx); requestAnimationFrame(loop); }
+
+        startBtn.addEventListener('click', () => { if (audioCtx.state === 'suspended') audioCtx.resume(); game.start(); });
+        howBtn.addEventListener('click', () => { alert('Move with arrow keys or A/D. Press Space to shoot. On touch tap top half to shoot and sides to move. Survive waves and beat the high score saved in your browser.'); });
+
+
+        game = new Game(); initStars(); resize(); requestAnimationFrame(loop);
+
+
+        setInterval(() => {
+            if (!game || game.state !== 'running') return;
+            if (game.enemies.length > 0 && Math.random() < 0.45) { const e = game.enemies[Math.floor(Math.random() * game.enemies.length)]; game.spawnBullet(e.x, e.y + 12, 250, 'enemy'); }
+        }, 700);
+
+        window.addEventListener('keydown', e => { if (e.key === 'p') { game.state = game.state === 'running' ? 'paused' : 'running'; overlay.style.display = game.state === 'paused' ? 'flex' : 'none'; } });
+
+    </script>
+</body>
+
+</html>
