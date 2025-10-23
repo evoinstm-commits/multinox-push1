@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: #f8f8f8;
+        color: #1d1d1f;
+    }
+
+    .navbar {
+        background-color: #fff;
+        border-bottom: 1px solid #ddd;
+        position: sticky;
+        top: 0;
+        width: 100%;
+        z-index: 1000;
+    }
+
+    .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 12px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .logo {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #000;
+        text-decoration: none;
+    }
+
+    .nav-links {
+        list-style: none;
+        display: flex;
+        gap: 32px;
+    }
+
+    .nav-links a {
+        text-decoration: none;
+        color: #333;
+        font-size: 1rem;
+        padding: 6px 0;
+        transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+        color: #0071e3;
+        border-bottom: 2px solid #0071e3;
+    }
+
+    .hero-section {
+        text-align: center;
+        padding: 100px 20px;
+        background-color: #fff;
+        filter: brightness(1.2)
+    }
+
+    .hero-section h1 {
+        font-size: 2.8rem;
+        margin-bottom: 20px;
+    }
+
+    .hero-section p {
+        font-size: 1.2rem;
+        color: #555;
+    }
+
+    .footer {
+        text-align: center;
+        padding: 24px 16px;
+        font-size: 0.9rem;
+        color: #666;
+        background-color: #f0f0f0;
+    }
+
+    .hero-section {
+        position: relative;
+        width: 100%;
+        height: 650px;
+        background-image: url('multbg1.jpg');
+        background-size: cover;
+        background-position: center;
+        color: white;
+    }
+
+    .hero-section::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        pointer-events: none;
+    }
+
+    .hero-section h1,
+    .hero-section p {
+        position: relative;
+        z-index: 1;
+    }
+
+    .image-container {
+        text-align: center;
+        margin-top: 30px;
+        filter: brightness(1.8);
+    }
+</style>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Modern Site</title>
+</head>
+
+<body>
+    <header class="navbar">
+        <nav class="nav-container">
+            <a href="#" class="logo">Multinox</a>
+            <ul class="nav-links">
+                <li><a href=""></a></li>
+                <li><a href="skbi website.html">SKBI</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="hero-section">
+        <h1>Welcome to Multinox</h1>
+        <p>
+            <font color="#FFFFFF">We are three, but our ideas are many. In this project we have combined 3 elements; a
+                database of information,
+                a quiz based on this information and a fun interactive game.
+                The three elements are respectively called The Student Knowledge Bank of India, Quizathon and Space
+                Invaders.</font>
+        </p>
+        <div class="image-container"><img src="multinox.png" height="300px" width="300px"></div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 Multinox. All rights reserved.</p>
+    </footer>
+</body>
+
+</html>
